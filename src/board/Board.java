@@ -52,7 +52,7 @@ public class Board {
 		for(Case c1 : this.cases)
 			c1.updateRoads(this);
 		this.initializeCaseNeighbours();
-		this.initializeRivers();
+		this.createRiver();
 	}
 
 	public void draw(Graphics g){
