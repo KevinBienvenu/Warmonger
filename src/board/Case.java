@@ -19,6 +19,10 @@ public class Case {
 	private float x,y;
 	private boolean hasRoad;
 	private boolean[] roads;
+	private boolean[] rivers;
+	private Case[] neighbours;
+	
+	public Color debugColor = null;
 	
 	boolean mouseOnIt = false;
 	
@@ -34,15 +38,18 @@ public class Case {
 			y = 2f*h*(i+0.5f);		
 		}
 		this.polygon = new Polygon();
-		this.polygon.addPoint(x-a/2, y+h);
-		this.polygon.addPoint(x-a, y);
-		this.polygon.addPoint(x-a/2, y-h);
-		this.polygon.addPoint(x+a/2, y-h);
 		this.polygon.addPoint(x+a, y);
+		this.polygon.addPoint(x+a/2, y-h);
+		this.polygon.addPoint(x-a/2, y-h);
+		this.polygon.addPoint(x-a, y);
+		this.polygon.addPoint(x-a/2, y+h);
 		this.polygon.addPoint(x+a/2, y+h);
 		this.owner = Constants.playerNeutral;
 		//this.terrain = Terrain.getRandomTerrain();
+		this.rivers = new boolean[6];
+		this.neighbours = new Case[6];
 	}
+
 	
 	public void setImprovement(Improvement imp){
 		this.improvement = imp;
@@ -89,6 +96,22 @@ public class Case {
 			g.setLineWidth(1);
 			
 		}
+		// drawing rivers
+		g.setColor(Color.cyan);
+		g.setLineWidth(5);
+		
+//		g.drawLine(this.polygon.getPoint(0)[0], this.polygon.getPoint(0)[1], this.polygon.getPoint(1)[0], this.polygon.getPoint(1)[1]);
+		for(int i=0; i<6; i++){
+			if(this.rivers[i]){
+				g.drawLine(this.polygon.getPoint(i)[0], this.polygon.getPoint(i)[1], this.polygon.getPoint((i+1)%6)[0], this.polygon.getPoint((i+1)%6)[1]);
+			}
+		}
+		g.setLineWidth(1f);
+		
+		if(this.debugColor!=null){
+			g.setColor(this.debugColor);
+			g.drawString("X", this.x, this.y);
+		}
 //		g.setColor(Color.black);
 //		g.drawString(""+i+" "+j, x, y);
 	}
@@ -108,6 +131,14 @@ public class Case {
 		this.roads = new boolean[6];
 	}
 
+	public void setNeighbour(int i, Case c){
+		this.neighbours[i] = c;
+	}
+	
+	public Case getNeighbour(int i){
+		return this.neighbours[(i+6)%6];
+	}
+	
 	public int getI() {return i;}
 	public void setI(int i) {this.i = i;}
 	public int getJ() {return j;}
@@ -115,6 +146,9 @@ public class Case {
 	public Polygon getPolygon() {return this.polygon;}
 	public float getX() {return x;}
 	public float getY() {return y;}
+	public void setRiver(int i, boolean b){
+		this.rivers[(i+6)%6] = b;
+	}
 	
 	public Terrain getTerrain() {return terrain;}
 	public void setTerrain(Terrain t) {this.terrain = t;}

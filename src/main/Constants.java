@@ -12,5 +12,7 @@ public class Constants {
 	public static float mouvementCam = 5f;
 	
 	public static Player playerNeutral;
+	
+	
 
 }
