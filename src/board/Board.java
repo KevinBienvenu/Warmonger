@@ -52,7 +52,9 @@ public class Board {
 		for(Case c1 : this.cases)
 			c1.updateRoads(this);
 		this.initializeCaseNeighbours();
-		this.createRiver();
+		for(int i=0; i<3+(int)(Math.random()*10); i++){
+			this.createRiver();
+		}
 	}
 
 	public void draw(Graphics g){
@@ -179,23 +181,51 @@ public class Board {
 				|| depart.getI()>this.sizeX-2
 				|| depart.getJ()<2
 				|| depart.getJ()>this.sizeY-2);
+		int compt = 0;
 		do{
 			intTravail = (int)(Math.random()*6);
 			caseTravail = depart.getNeighbour(intTravail);
 			System.out.println("2");
-		} while (caseTravail==null 
-				|| caseTravail.getTerrain()==Terrain.WATER
-				|| this.getNumberOfWaterNeighbours(caseTravail)>2);
-		int compt = 0;
+			compt++;
+		} while (compt<10 && (caseTravail==null 
+							|| caseTravail.getTerrain()==Terrain.WATER
+							|| this.getNumberOfWaterNeighbours(caseTravail)>2));
+		if(compt==10){
+			return;
+		}
+		compt = 0;
+		int mathrandom;
 		do{
 			compt ++;
-			rand = ((intTravail+3)%6+(int)(Math.random()*2)*2-1)%6;
+			mathrandom = (int)(Math.random()*2)*2-1;
+			rand = ((intTravail+3)%6+mathrandom)%6;
 			System.out.println("3");
 		} while (compt<10 && (caseTravail.getNeighbour(rand)==null || caseTravail.getNeighbour(rand).getTerrain()==Terrain.WATER) );
 		if(compt<10){
 			caseTravail.setRiver(rand, true );
 			caseTravail.getNeighbour(rand).setRiver((rand+3)%6, true);
-			
+			if(mathrandom==-1){
+				caseTravail = caseTravail.getNeighbour(rand);
+				caseTravail.debugColor = Color.white;
+				intTravail+=1 ;
+				mathrandom = mathrandom * (-1);
+				rand = ((intTravail+3)%6+mathrandom)%6;
+			}
+			caseTravail = caseTravail.getNeighbour(rand+mathrandom);
+			intTravail = (rand+mathrandom+3)%6;
+			caseTravail.debugColor = Color.red;
+			boolean goingOn = Math.random()>0.1;
+			int oldRandom;
+			while(goingOn){
+				oldRandom = mathrandom;
+				mathrandom = Math.min(1,(int)(Math.random()*2f+0.2f*(0.5f-oldRandom)/0.5f));
+				caseTravail.setRiver(intTravail+mathrandom, true);
+				caseTravail.getNeighbour(intTravail+mathrandom).setRiver((intTravail+mathrandom+3)%6, true);
+				//going on
+				caseTravail = caseTravail.getNeighbour(intTravail+(-1)*(1-mathrandom)+2*mathrandom);
+				intTravail = (intTravail+(-1)*(1-mathrandom)+2*mathrandom+3)%6+(-1)*(1-mathrandom);
+				goingOn = Math.random()>0.1 && caseTravail!=null && caseTravail.getTerrain()!=Terrain.WATER;
+			}
 		}
 	}
 
